@@ -27,9 +27,9 @@ while(<IN>){
 	chomp;
 	my $line = $_;
 	$line =~ s/^ +//g;
-	if($line =~ /^[类rik]/){#特殊处理
-		$line = ' '.$line;
-	}
+#	if($line =~ /^[类rik]/){#特殊处理
+#		$line = ' '.$line;
+#	}
 	$content .= $line;
 }
 
@@ -57,7 +57,7 @@ for(my $i = 0; $i < @contents; $i++){
 		}
 		$flag = "eTag";
 	}elsif($contents[$i] =~ /<.+?\/>/){
-		
+		#一体标签，不作处理
 	}elsif($contents[$i] =~ /<(.+?)>/){#开始标签
 		my $tmp = $1;
 		$tmp =~ s/^(.+?) .+$/$1/ if $tmp =~ / /;
