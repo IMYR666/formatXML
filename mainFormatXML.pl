@@ -10,21 +10,19 @@ use feature qw(say);
 
 my $dictName = "swg_xhzd";
 my $root     = "E:/dict/$dictName/";
-my $in       = $root . $dictName . "_test.xml";
-my $log      = $root . $dictName . "_log.txt";
+#输入文件路径
+my $in       = $root . $dictName . "_origin.xml";
+#输出文件路径
 my $out     = $root . $dictName . "_origin_format.xml";
-
 open IN,   "<", $in   or die $!;
 open OUT, ">",  $out  or die $!;
 
-#open LOG, ">", $log or die $!;
-
+#缩进符号
 my $indentMark = "\t";
+#缩进个数
 my $indentNum = 1;
 
-my $indentDeep = 0;	
 my $content = "";
- 
 while(<IN>){
 	chomp;
 	my $line = $_;
@@ -42,10 +40,10 @@ if($content =~ /<(.+?)>/){
 	$content =~ s/^<yangrui>|<yangrui>$//g;
 	@contents = split /<yangrui>/, $content;
 }
-#say Dumper \@contents;
-#exit;
+
 my $indent = "";
 my $flag = "None";
+my $indentDeep = 0;	
 my @tags = ();
 for(my $i = 0; $i < @contents; $i++){
 	next if $contents[$i] =~ /<\?.+?\?>/;
@@ -53,7 +51,6 @@ for(my $i = 0; $i < @contents; $i++){
 	if($contents[$i] =~ /<\/(.+?)>/){#结束标签
 		#判断标签是否配对	
 		isPairOfTag($1);
-		
 		if($flag eq "eTag" || $flag eq "content"){
 			$indentDeep--;
 			$indent = getIndent($indentDeep);
@@ -71,6 +68,13 @@ for(my $i = 0; $i < @contents; $i++){
 			$indent = getIndent($indentDeep);
 		}
 		$flag = "bTag";
+		if($contents[$i+2] eq "</$tmp>"){#最内层标签不换行
+			say OUT $indent.$contents[$i].$contents[$i+1].$contents[$i+2];
+			$i += 2;
+			pop @tags;
+			$flag = "eTag";
+			next;
+		}
 	}else{#纯文本内容
 		if($flag eq "bTag"){
 			$indentDeep++;
